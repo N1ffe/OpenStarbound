@@ -16,6 +16,9 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
   auto params = celestialDatabase->parameters(coordinate);
   if (!params)
     return;
+
+  auto systemParams = celestialDatabase->parameters(coordinate.system());
+
   seed = staticRandomU64(params->seed(), "SkySeed");
 
   // Gather up all the CelestialParameters and scales for all the celestial
@@ -50,6 +53,14 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
   horizonImages = CelestialGraphics::worldHorizonImages(*params);
 
   readVisitableParameters(params->visitableParameters());
+
+  sunType = systemParams->getParameter("typeName").toString();
+  sunSize = systemParams->getParameter("imageScale", 0.055f).toFloat();
+
+  if (!selfCoordinate.isSatelliteBody())
+    orbit = coordinate.orbitNumber();
+  else
+    orbit = selfCoordinate.parent().orbitNumber();
 }
 
 SkyParameters::SkyParameters(SkyParameters const& oldSkyParameters, VisitableWorldParametersConstPtr newVisitableParameters) : SkyParameters() {
@@ -108,6 +119,10 @@ SkyParameters::SkyParameters(Json const& config) : SkyParameters() {
 
   spaceLevel = config.optFloat("spaceLevel");
   surfaceLevel = config.optFloat("surfaceLevel");
+
+  sunType = config.getString("sunType", "");
+  sunSize = config.getFloat("sunSize", 0.055f);
+  orbit = config.getInt("orbit", 0);
 }
 
 Json SkyParameters::toJson() const {
@@ -149,6 +164,9 @@ Json SkyParameters::toJson() const {
       {"ambientLightLevel", jsonFromMaybe<Color>(skyColoring.maybeRight(), [](Color c) { return jsonFromColor(c); })},
       {"spaceLevel", jsonFromMaybe<float>(spaceLevel)},
       {"surfaceLevel", jsonFromMaybe<float>(surfaceLevel)},
+      {"sunType", sunType},
+      {"sunSize", sunSize},
+      {"orbit", orbit}
   };
 }
 
@@ -163,6 +181,9 @@ void SkyParameters::read(DataStream& ds) {
   ds >> skyColoring;
   ds >> spaceLevel;
   ds >> surfaceLevel;
+  ds >> sunType;
+  ds >> sunSize;
+  ds >> orbit;
 }
 
 void SkyParameters::write(DataStream& ds) const {
@@ -176,6 +197,9 @@ void SkyParameters::write(DataStream& ds) const {
   ds << skyColoring;
   ds << spaceLevel;
   ds << surfaceLevel;
+  ds << sunType;
+  ds << sunSize;
+  ds << orbit;
 }
 
 void SkyParameters::readVisitableParameters(VisitableWorldParametersConstPtr visitableParameters) {

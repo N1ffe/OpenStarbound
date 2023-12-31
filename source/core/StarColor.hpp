@@ -136,6 +136,7 @@ public:
   // Mix two colors, giving the second color the given amount
   Color mix(Color const& c, float amount = 0.5f) const;
   Color multiply(float amount) const;
+  Color multiplyRgb(float amount) const;
 
   bool operator==(Color const& c) const;
   bool operator!=(Color const& c) const;
