@@ -1,0 +1,13 @@
+[
+  {
+    "op": "add",
+    "path": "/sun/images",
+    "value": {
+      "whitestar" : "/sky/orbitals/whitestar.png",
+      "orangestar" : "/sky/orbitals/orangestar.png",
+      "yellowstar" : "/sky/orbitals/yellowstar.png",
+      "bluestar" : "/sky/orbitals/bluestar.png",
+      "redstar" : "/sky/orbitals/redstar.png"
+    }
+  }
+]
