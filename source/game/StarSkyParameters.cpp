@@ -16,6 +16,9 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
   auto params = celestialDatabase->parameters(coordinate);
   if (!params)
     return;
+
+  auto systemParams = celestialDatabase->parameters(coordinate.system());
+
   seed = staticRandomU64(params->seed(), "SkySeed");
 
   // Gather up all the CelestialParameters and scales for all the celestial
@@ -51,7 +54,8 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
 
   readVisitableParameters(params->visitableParameters());
 
-  systemTypeName = params->getParameter("typeName", "").toString();
+  if (systemParams)
+    systemTypeName = systemParams->getParameter("typeName", "").toString();
 }
 
 SkyParameters::SkyParameters(SkyParameters const& oldSkyParameters, VisitableWorldParametersConstPtr newVisitableParameters) : SkyParameters() {
@@ -111,7 +115,7 @@ SkyParameters::SkyParameters(Json const& config) : SkyParameters() {
   spaceLevel = config.optFloat("spaceLevel");
   surfaceLevel = config.optFloat("surfaceLevel");
 
-  systemTypeName = config.getString("systemTypeName");
+  systemTypeName = config.optString("systemTypeName");
 }
 
 Json SkyParameters::toJson() const {
@@ -153,7 +157,7 @@ Json SkyParameters::toJson() const {
       {"ambientLightLevel", jsonFromMaybe<Color>(skyColoring.maybeRight(), [](Color c) { return jsonFromColor(c); })},
       {"spaceLevel", jsonFromMaybe<float>(spaceLevel)},
       {"surfaceLevel", jsonFromMaybe<float>(surfaceLevel)},
-      {"systemTypeName", systemTypeName}
+      {"systemTypeName", jsonFromMaybe<String>(systemTypeName)}
   };
 }
 
