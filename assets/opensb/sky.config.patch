@@ -1,6 +1,26 @@
 [
   {
     "op": "add",
+    "path": "/sun/dynamicImage",
+    "value": true
+  },
+  {
+    "op": "add",
+    "path": "/sun/dynamicSize",
+    "value": true
+  },
+  {
+    "op": "add",
+    "path": "/sun/dynamicBrightness",
+    "value": true
+  },
+  {
+    "op": "add",
+    "path": "/sun/rayColor",
+    "value": [255, 255, 200]
+  },
+  {
+    "op": "add",
     "path": "/sun/images",
     "value": {
       "whitestar" : "/sky/orbitals/whitestar.png",
@@ -8,6 +28,17 @@
       "yellowstar" : "/sky/orbitals/yellowstar.png",
       "bluestar" : "/sky/orbitals/bluestar.png",
       "redstar" : "/sky/orbitals/redstar.png"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/sun/rayColors",
+    "value": {
+      "whitestar" : [199, 245, 255],
+      "orangestar" : [255, 227, 199],
+      "yellowstar" : [245, 255, 199],
+      "bluestar" : [199, 199, 255],
+      "redstar" : [255, 213, 199]
     }
   }
 ]
