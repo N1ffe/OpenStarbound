@@ -55,7 +55,7 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
   readVisitableParameters(params->visitableParameters());
 
   if (systemParams)
-    systemTypeName = systemParams->getParameter("typeName", "").toString();
+    sunType = systemParams->getParameter("typeName", "").toString();
 }
 
 SkyParameters::SkyParameters(SkyParameters const& oldSkyParameters, VisitableWorldParametersConstPtr newVisitableParameters) : SkyParameters() {
@@ -115,7 +115,8 @@ SkyParameters::SkyParameters(Json const& config) : SkyParameters() {
   spaceLevel = config.optFloat("spaceLevel");
   surfaceLevel = config.optFloat("surfaceLevel");
 
-  systemTypeName = config.optString("systemTypeName");
+  if (config.contains("sunType") && config.get("sunType"))
+    sunType = config.optString("sunType");
 }
 
 Json SkyParameters::toJson() const {
@@ -157,7 +158,7 @@ Json SkyParameters::toJson() const {
       {"ambientLightLevel", jsonFromMaybe<Color>(skyColoring.maybeRight(), [](Color c) { return jsonFromColor(c); })},
       {"spaceLevel", jsonFromMaybe<float>(spaceLevel)},
       {"surfaceLevel", jsonFromMaybe<float>(surfaceLevel)},
-      {"systemTypeName", jsonFromMaybe<String>(systemTypeName)}
+      {"sunType", jsonFromMaybe<String>(sunType)}
   };
 }
 
@@ -172,7 +173,7 @@ void SkyParameters::read(DataStream& ds) {
   ds >> skyColoring;
   ds >> spaceLevel;
   ds >> surfaceLevel;
-  ds >> systemTypeName;
+  ds >> sunType;
 }
 
 void SkyParameters::write(DataStream& ds) const {
@@ -186,7 +187,7 @@ void SkyParameters::write(DataStream& ds) const {
   ds << skyColoring;
   ds << spaceLevel;
   ds << surfaceLevel;
-  ds << systemTypeName;
+  ds << sunType;
 }
 
 void SkyParameters::readVisitableParameters(VisitableWorldParametersConstPtr visitableParameters) {

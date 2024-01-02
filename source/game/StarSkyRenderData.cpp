@@ -96,8 +96,8 @@ List<SkyOrbiter> SkyRenderData::frontOrbiters(Vec2F const& viewSize) const {
   List<SkyOrbiter> orbiters;
   if (type == SkyType::Atmospheric || type == SkyType::Atmosphereless) {
     String image;
-    if (settings.queryBool("sun.dynamicImage", false)) {
-      image = settings.queryString("sun.images." + skyParameters.systemTypeName.value(), settings.queryString("sun.image"));
+    if (settings.queryBool("sun.dynamicImage", false) && skyParameters.sunType) {
+      image = settings.queryString("sun.images." + skyParameters.sunType.value(), settings.queryString("sun.image"));
     } else {
       image = settings.queryString("sun.image");
     }

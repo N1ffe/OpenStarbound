@@ -45,7 +45,7 @@ struct SkyParameters {
   Either<SkyColoring, Color> skyColoring;
   Maybe<float> spaceLevel;
   Maybe<float> surfaceLevel;
-  Maybe<String> systemTypeName;
+  Maybe<String> sunType;
 };
 
 DataStream& operator>>(DataStream& ds, SkyParameters& sky);
