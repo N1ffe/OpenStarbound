@@ -381,8 +381,8 @@ void EnvironmentPainter::drawRay(float pixelRatio,
   // Rays show up more on darker backgrounds, so this scales to remove that
   float sum = std::pow((color[0] + color[1]) * RayColorDependenceScale, RayColorDependenceLevel);
   Vec3B rayColor;
-  if (sky.settings.queryBool("sun.dynamicImage", false) && sky.skyParameters.sunType) {
-    rayColor = jsonToVec3B(sky.settings.query("sun.rayColors." + sky.skyParameters.sunType.value(), sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] })));
+  if (sky.settings.queryBool("sun.dynamicImage.active", false) && sky.skyParameters.sunType) {
+    rayColor = jsonToVec3B(sky.settings.query("sun.dynamicImage.rayColors." + sky.skyParameters.sunType.value(), sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] })));
   } else {
     rayColor = jsonToVec3B(sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] }));
   }
