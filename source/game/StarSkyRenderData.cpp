@@ -101,8 +101,12 @@ List<SkyOrbiter> SkyRenderData::frontOrbiters(Vec2F const& viewSize) const {
     } else {
       image = settings.queryString("sun.image");
     }
+    float scale = 1.0f;
+    if (settings.queryBool("sun.dynamicSize.active", false) && skyParameters.sunSize) {
+      scale = skyParameters.sunSize.value() / settings.queryFloat("sun.dynamicSize.baseCoefficient", 0.055f);
+    }
     orbiters.append({SkyOrbiterType::Sun,
-        1.0f,
+        scale,
         0.0f,
         image,
         Vec2F::withAngle(orbitAngle, settings.queryFloat("sun.radius")) + viewSize / 2}); // make radius dynamic as well, based on star size and orbit (farther orbit - smaller sun). If distance is applied, make lighting based on it as well, and make it optional

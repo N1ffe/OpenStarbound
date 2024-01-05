@@ -386,15 +386,19 @@ void EnvironmentPainter::drawRay(float pixelRatio,
   } else {
     rayColor = jsonToVec3B(sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] }));
   }
+  float radiusScale = 1.0f;
+  if (sky.settings.queryBool("sun.dynamicSize.active", false) && sky.skyParameters.sunSize) {
+    radiusScale = sky.skyParameters.sunSize.value() / sky.settings.queryFloat("sun.dynamicSize.baseCoefficient", 0.055f);
+  }
   m_renderer->immediatePrimitives().emplace_back(std::in_place_type_t<RenderQuad>(), TexturePtr(),
       RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * length, {}, Vec4B(rayColor, 0), 0.0f},
-      RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * SunRadius * pixelRatio,
+      RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * SunRadius * radiusScale * pixelRatio,
           {},
           Vec4B(rayColor,
               (int)(RayMinUnscaledAlpha + std::abs(m_rayPerlin.get(angle * 896 + time * 30) * RayUnscaledAlphaVariance))
                   * sum
                   * alpha), 0.0f},
-      RenderVertex{start + Vec2F(std::cos(angle), std::sin(angle)) * SunRadius * pixelRatio,
+      RenderVertex{start + Vec2F(std::cos(angle), std::sin(angle)) * SunRadius * radiusScale * pixelRatio,
           {},
           Vec4B(rayColor,
               (int)(RayMinUnscaledAlpha + std::abs(m_rayPerlin.get(angle * 626 + time * 30) * RayUnscaledAlphaVariance))

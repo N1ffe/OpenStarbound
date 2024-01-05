@@ -28,7 +28,10 @@
   {
     "op": "add",
     "path": "/sun/dynamicSize",
-    "value": true
+    "value": {
+      "active" : true,
+      "baseCoefficient" : 0.055 // medium imageScale from celestial.config
+    }
   },
   {
     "op": "add",
