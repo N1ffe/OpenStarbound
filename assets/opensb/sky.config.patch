@@ -29,8 +29,19 @@
     "op": "add",
     "path": "/sun/dynamicSize",
     "value": {
-      "active" : true,
-      "baseCoefficient" : 0.055 // medium imageScale from celestial.config
+	
+      // calculates scale as imageScale / baseSize
+      "bySize" : {
+        "active" : true,
+        "baseSize" : 0.055 // medium imageScale from celestial.config
+      },
+	  
+      // calculates scale based on the orbit of a planet
+      "byDistance" : {
+        "active" : false,
+        "maxScale" : 2.194, // scale on the 1st orbit
+        "step" : 0.194 // scale decrease with each next orbit
+      }
     }
   },
   {

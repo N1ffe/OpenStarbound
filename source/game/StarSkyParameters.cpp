@@ -54,10 +54,9 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
 
   readVisitableParameters(params->visitableParameters());
 
-  if (systemParams) {
-    sunType = systemParams->getParameter("typeName", "").toString();
-    sunSize = systemParams->getParameter("imageScale", 0.055f).toFloat();
-  }
+  sunType = systemParams->getParameter("typeName").toString();
+  sunSize = systemParams->getParameter("imageScale", 0.055f).toFloat();
+  orbit = coordinate.orbitNumber();
 }
 
 SkyParameters::SkyParameters(SkyParameters const& oldSkyParameters, VisitableWorldParametersConstPtr newVisitableParameters) : SkyParameters() {
@@ -117,11 +116,9 @@ SkyParameters::SkyParameters(Json const& config) : SkyParameters() {
   spaceLevel = config.optFloat("spaceLevel");
   surfaceLevel = config.optFloat("surfaceLevel");
 
-  if (config.contains("sunType") && config.get("sunType"))
-    sunType = config.optString("sunType");
-
-  if (config.contains("sunSize") && config.get("sunSize"))
-    sunSize = config.optFloat("sunSize");
+  sunType = config.getString("sunType", "");
+  sunSize = config.getFloat("sunSize", 0.055f);
+  orbit = config.getInt("orbit", 0);
 }
 
 Json SkyParameters::toJson() const {
@@ -163,8 +160,9 @@ Json SkyParameters::toJson() const {
       {"ambientLightLevel", jsonFromMaybe<Color>(skyColoring.maybeRight(), [](Color c) { return jsonFromColor(c); })},
       {"spaceLevel", jsonFromMaybe<float>(spaceLevel)},
       {"surfaceLevel", jsonFromMaybe<float>(surfaceLevel)},
-      {"sunType", jsonFromMaybe<String>(sunType)},
-      {"sunSize", jsonFromMaybe<float>(sunSize)}
+      {"sunType", sunType},
+      {"sunSize", sunSize},
+      {"orbit", orbit}
   };
 }
 
@@ -181,6 +179,7 @@ void SkyParameters::read(DataStream& ds) {
   ds >> surfaceLevel;
   ds >> sunType;
   ds >> sunSize;
+  ds >> orbit;
 }
 
 void SkyParameters::write(DataStream& ds) const {
@@ -196,6 +195,7 @@ void SkyParameters::write(DataStream& ds) const {
   ds << surfaceLevel;
   ds << sunType;
   ds << sunSize;
+  ds << orbit;
 }
 
 void SkyParameters::readVisitableParameters(VisitableWorldParametersConstPtr visitableParameters) {

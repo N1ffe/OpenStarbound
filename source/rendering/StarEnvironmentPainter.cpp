@@ -380,16 +380,19 @@ void EnvironmentPainter::drawRay(float pixelRatio,
   // Sum is used to vary the ray intensity based on sky color
   // Rays show up more on darker backgrounds, so this scales to remove that
   float sum = std::pow((color[0] + color[1]) * RayColorDependenceScale, RayColorDependenceLevel);
+
   Vec3B rayColor;
-  if (sky.settings.queryBool("sun.dynamicImage.active", false) && sky.skyParameters.sunType) {
-    rayColor = jsonToVec3B(sky.settings.query("sun.dynamicImage.rayColors." + sky.skyParameters.sunType.value(), sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] })));
-  } else {
+  if (sky.settings.queryBool("sun.dynamicImage.active", false) && !sky.skyParameters.sunType.empty())
+    rayColor = jsonToVec3B(sky.settings.query("sun.dynamicImage.rayColors." + sky.skyParameters.sunType, sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] })));
+  else
     rayColor = jsonToVec3B(sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] }));
-  }
+
   float radiusScale = 1.0f;
-  if (sky.settings.queryBool("sun.dynamicSize.active", false) && sky.skyParameters.sunSize) {
-    radiusScale = sky.skyParameters.sunSize.value() / sky.settings.queryFloat("sun.dynamicSize.baseCoefficient", 0.055f);
-  }
+  if (sky.settings.queryBool("sun.dynamicSize.bySize.active", false))
+    radiusScale *= sky.skyParameters.sunSize / sky.settings.queryFloat("sun.dynamicSize.bySize.baseSize", 0.055f);
+  if (sky.settings.queryBool("sun.dynamicSize.byDistance.active", false) && sky.skyParameters.orbit > 0)
+    radiusScale *= sky.settings.queryFloat("sun.dynamicSize.byDistance.maxScale", 1.0f) - ((sky.skyParameters.orbit - 1) * sky.settings.queryFloat("sun.dynamicSize.byDistance.step", 0.0f));
+
   m_renderer->immediatePrimitives().emplace_back(std::in_place_type_t<RenderQuad>(), TexturePtr(),
       RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * length, {}, Vec4B(rayColor, 0), 0.0f},
       RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * SunRadius * radiusScale * pixelRatio,
