@@ -56,7 +56,11 @@ SkyParameters::SkyParameters(CelestialCoordinate const& coordinate, CelestialDat
 
   sunType = systemParams->getParameter("typeName").toString();
   sunSize = systemParams->getParameter("imageScale", 0.055f).toFloat();
-  orbit = coordinate.orbitNumber();
+
+  if (!selfCoordinate.isSatelliteBody())
+    orbit = coordinate.orbitNumber();
+  else
+    orbit = selfCoordinate.parent().orbitNumber();
 }
 
 SkyParameters::SkyParameters(SkyParameters const& oldSkyParameters, VisitableWorldParametersConstPtr newVisitableParameters) : SkyParameters() {

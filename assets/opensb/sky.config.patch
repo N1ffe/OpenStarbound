@@ -6,6 +6,15 @@
   },
   {
     "op": "add",
+    "path": "/sun/highRes",
+    "value": {
+      "active" : false,
+      "resIncrease" : 4, // relative to the original
+      "image" : "/sky/orbitals/highres/4x/sun.png"
+    }
+  },
+  {
+    "op": "add",
     "path": "/sun/dynamicImage",
     "value": {
       "active" : true,
@@ -15,6 +24,13 @@
         "yellowstar" : "/sky/orbitals/yellowstar.png",
         "bluestar" : "/sky/orbitals/bluestar.png",
         "redstar" : "/sky/orbitals/redstar.png"
+      },
+      "highResImages" : {
+        "whitestar" : "/sky/orbitals/highres/4x/whitestar.png",
+        "orangestar" : "/sky/orbitals/highres/4x/orangestar.png",
+        "yellowstar" : "/sky/orbitals/highres/4x/yellowstar.png",
+        "bluestar" : "/sky/orbitals/highres/4x/bluestar.png",
+        "redstar" : "/sky/orbitals/highres/4x/redstar.png"
       },
       "rayColors" : {
         "whitestar" : [199, 245, 255],
@@ -44,6 +60,8 @@
       }
     }
   },
+  
+  // TODO, plus make sun render behind satellites
   {
     "op": "add",
     "path": "/sun/dynamicBrightness",
