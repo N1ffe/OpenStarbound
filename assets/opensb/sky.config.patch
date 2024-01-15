@@ -61,7 +61,7 @@
     }
   },
   
-  // TODO, plus make sun render behind satellites
+  // TODO
   {
     "op": "add",
     "path": "/sun/dynamicBrightness",
