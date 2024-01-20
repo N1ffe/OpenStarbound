@@ -93,6 +93,8 @@ public:
   pair<Color, Color> skyRectColors() const;
   Color skyFlashColor() const;
 
+  float brightnessMultiplier() const;
+
   bool flying() const;
   FlyingType flyingType() const;
   float warpProgress() const;

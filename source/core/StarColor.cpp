@@ -490,6 +490,10 @@ Color Color::multiply(float amount) const {
   return Color::rgbaf(m_data * amount);
 }
 
+Color Color::multiplyRgb(float amount) const {
+  return Color::rgbaf(m_data[0] * amount, m_data[1] * amount, m_data[2] * amount, m_data[3]);
+}
+
 Color Color::operator+(Color const& c) const {
   return Color::rgbaf(m_data + c.toRgbaF());
 }

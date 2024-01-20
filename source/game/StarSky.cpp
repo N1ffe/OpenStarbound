@@ -398,10 +398,21 @@ Color Sky::environmentLight() const {
     auto skyColoring = m_skyParameters.skyColoring.left();
 
     Array<Vec4F, 4> colors;
-    colors[0] = skyColoring.morningLightColor.toRgbaF();
-    colors[1] = skyColoring.dayLightColor.toRgbaF();
-    colors[2] = skyColoring.eveningLightColor.toRgbaF();
-    colors[3] = skyColoring.nightLightColor.toRgbaF();
+    float multiplier = brightnessMultiplier();
+    if (multiplier != 1.0f) {
+      multiplier *= m_settings.queryFloat("sun.dynamicBrightness.intensity", 1.0f);
+
+      colors[0] = skyColoring.morningLightColor.multiplyRgb(multiplier).toRgbaF();
+      colors[1] = skyColoring.dayLightColor.multiplyRgb(multiplier).toRgbaF();
+      colors[2] = skyColoring.eveningLightColor.multiplyRgb(multiplier).toRgbaF();
+      colors[3] = skyColoring.nightLightColor.multiplyRgb(multiplier).toRgbaF();
+    }
+    else {
+      colors[0] = skyColoring.morningLightColor.toRgbaF();
+      colors[1] = skyColoring.dayLightColor.toRgbaF();
+      colors[2] = skyColoring.eveningLightColor.toRgbaF();
+      colors[3] = skyColoring.nightLightColor.toRgbaF();
+    }
 
     return Color::rgbaf(listInterpolate2(colors, dayCycle(), SinWeightOperator<float>(), BoundMode::Wrap));
   } else {
@@ -421,16 +432,34 @@ pair<Color, Color> Sky::skyRectColors() const {
     auto skyColoring = m_skyParameters.skyColoring.left();
 
     Array<Vec4F, 4> topColorList;
-    topColorList[0] = skyColoring.morningColors.first.toRgbaF();
-    topColorList[1] = skyColoring.dayColors.first.toRgbaF();
-    topColorList[2] = skyColoring.eveningColors.first.toRgbaF();
-    topColorList[3] = skyColoring.nightColors.first.toRgbaF();
-
     Array<Vec4F, 4> bottomColorList;
-    bottomColorList[0] = skyColoring.morningColors.second.toRgbaF();
-    bottomColorList[1] = skyColoring.dayColors.second.toRgbaF();
-    bottomColorList[2] = skyColoring.eveningColors.second.toRgbaF();
-    bottomColorList[3] = skyColoring.nightColors.second.toRgbaF();
+
+    float multiplier = brightnessMultiplier();
+
+    if (multiplier != 1.0f) {
+      multiplier *= m_settings.queryFloat("sun.dynamicBrightness.intensity", 1.0f);
+
+      topColorList[0] = skyColoring.morningColors.first.multiplyRgb(multiplier).toRgbaF();
+      topColorList[1] = skyColoring.dayColors.first.multiplyRgb(multiplier).toRgbaF();
+      topColorList[2] = skyColoring.eveningColors.first.multiplyRgb(multiplier).toRgbaF();
+      topColorList[3] = skyColoring.nightColors.first.multiplyRgb(multiplier).toRgbaF();
+
+      bottomColorList[0] = skyColoring.morningColors.second.multiplyRgb(multiplier).toRgbaF();
+      bottomColorList[1] = skyColoring.dayColors.second.multiplyRgb(multiplier).toRgbaF();
+      bottomColorList[2] = skyColoring.eveningColors.second.multiplyRgb(multiplier).toRgbaF();
+      bottomColorList[3] = skyColoring.nightColors.second.multiplyRgb(multiplier).toRgbaF();
+    }
+    else {
+      topColorList[0] = skyColoring.morningColors.first.toRgbaF();
+      topColorList[1] = skyColoring.dayColors.first.toRgbaF();
+      topColorList[2] = skyColoring.eveningColors.first.toRgbaF();
+      topColorList[3] = skyColoring.nightColors.first.toRgbaF();
+
+      bottomColorList[0] = skyColoring.morningColors.second.toRgbaF();
+      bottomColorList[1] = skyColoring.dayColors.second.toRgbaF();
+      bottomColorList[2] = skyColoring.eveningColors.second.toRgbaF();
+      bottomColorList[3] = skyColoring.nightColors.second.toRgbaF();
+    }
 
     float cycle = dayCycle();
     auto topColor = Color::rgbaf(listInterpolate2(topColorList, cycle, SinWeightOperator<float>(), BoundMode::Wrap));
@@ -450,6 +479,15 @@ Color Sky::skyFlashColor() const {
   Color res = Color::White;
   res.setAlphaF(m_flashTimer / m_settings.queryFloat("flashTimer"));
   return res;
+}
+
+float Sky::brightnessMultiplier() const {
+  float multiplier = 1.0f;
+  if (m_settings.queryBool("sun.dynamicBrightness.bySize", false))
+    multiplier *= m_skyParameters.sunSize / m_settings.queryFloat("sun.dynamicSize.bySize.baseSize", 0.055f);
+  if (m_settings.queryBool("sun.dynamicBrightness.byDistance", false) && m_skyParameters.orbit > 0)
+    multiplier *= m_settings.queryFloat("sun.dynamicSize.byDistance.maxScale", 1.0f) - ((m_skyParameters.orbit - 1) * m_settings.queryFloat("sun.dynamicSize.byDistance.step", 0.0f));
+  return multiplier;
 }
 
 bool Sky::flying() const {
