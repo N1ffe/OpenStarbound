@@ -65,10 +65,15 @@
     "op": "add",
     "path": "/sun/dynamicBrightness",
     "value": {
-      // calculated as a multplier based on size and distance scaling
+      // calculated as a multplier based on size and distance scaling:
+      // (imageScale / baseSize) * (maxScale - ((orbit - 1) * step)) * intensity
+      // recommended to be close to 1.0 at 5-6th orbit (assuming that imageScale / baseSize = 1)
       "bySize" : false,
       "byDistance" : false,
-      "intensity" : 1.2 // to adjust brightness if distance scaling results in more values lower than 1
+	  
+      // adjust brightness if distance scaling results in more values lower than 1.0
+      // applied only if any of the dynamic brightness modifiers are active
+      "intensity" : 1.2
     }
   }
 ]
