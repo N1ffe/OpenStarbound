@@ -387,21 +387,21 @@ void EnvironmentPainter::drawRay(float pixelRatio,
   else
     rayColor = jsonToVec3B(sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] }));
 
-  float radiusScale = 1.0f;
-  if (sky.settings.queryBool("sun.dynamicSize.bySize.active", false))
-    radiusScale *= sky.skyParameters.sunSize / sky.settings.queryFloat("sun.dynamicSize.bySize.baseSize", 0.055f);
-  if (sky.settings.queryBool("sun.dynamicSize.byDistance.active", false) && sky.skyParameters.orbit > 0)
-    radiusScale *= sky.settings.queryFloat("sun.dynamicSize.byDistance.maxScale", 1.0f) - ((sky.skyParameters.orbit - 1) * sky.settings.queryFloat("sun.dynamicSize.byDistance.step", 0.0f));
+  float sunScale = sky.settings.queryFloat("sun.scale", 1.0f);
+  if (sky.settings.queryBool("sun.dynamicScale.bySize.active", false))
+    sunScale *= sky.skyParameters.sunSize / sky.settings.queryFloat("sun.dynamicScale.bySize.baseSize", 0.055f);
+  if (sky.settings.queryBool("sun.dynamicScale.byDistance.active", false) && sky.skyParameters.orbit > 0)
+    sunScale *= sky.settings.queryFloat("sun.dynamicScale.byDistance.maxScale", 1.0f) - ((sky.skyParameters.orbit - 1) * sky.settings.queryFloat("sun.dynamicScale.byDistance.step", 0.0f));
 
   m_renderer->immediatePrimitives().emplace_back(std::in_place_type_t<RenderQuad>(), TexturePtr(),
       RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * length, {}, Vec4B(rayColor, 0), 0.0f},
-      RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * SunRadius * radiusScale * pixelRatio,
+      RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * SunRadius * sunScale * pixelRatio,
           {},
           Vec4B(rayColor,
               (int)(RayMinUnscaledAlpha + std::abs(m_rayPerlin.get(angle * 896 + time * 30) * RayUnscaledAlphaVariance))
                   * sum
                   * alpha), 0.0f},
-      RenderVertex{start + Vec2F(std::cos(angle), std::sin(angle)) * SunRadius * radiusScale * pixelRatio,
+      RenderVertex{start + Vec2F(std::cos(angle), std::sin(angle)) * SunRadius * sunScale * pixelRatio,
           {},
           Vec4B(rayColor,
               (int)(RayMinUnscaledAlpha + std::abs(m_rayPerlin.get(angle * 626 + time * 30) * RayUnscaledAlphaVariance))

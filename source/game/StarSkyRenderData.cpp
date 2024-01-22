@@ -110,11 +110,11 @@ List<SkyOrbiter> SkyRenderData::frontOrbiters(Vec2F const& viewSize) const {
     else
       image = settings.queryString(path + ".image");
 
-    float scale = 1.0f;
-    if (settings.queryBool("sun.dynamicSize.bySize.active", false))
-      scale *= skyParameters.sunSize / settings.queryFloat("sun.dynamicSize.bySize.baseSize", 0.055f);
-    if (settings.queryBool("sun.dynamicSize.byDistance.active", false) && skyParameters.orbit > 0)
-      scale *= settings.queryFloat("sun.dynamicSize.byDistance.maxScale", 1.0f) - ((skyParameters.orbit - 1) * settings.queryFloat("sun.dynamicSize.byDistance.step", 0.0f));
+    float scale = settings.queryFloat("sun.scale", 1.0f);
+    if (settings.queryBool("sun.dynamicScale.bySize.active", false))
+      scale *= skyParameters.sunSize / settings.queryFloat("sun.dynamicScale.bySize.baseSize", 0.055f);
+    if (settings.queryBool("sun.dynamicScale.byDistance.active", false) && skyParameters.orbit > 0)
+      scale *= settings.queryFloat("sun.dynamicScale.byDistance.maxScale", 1.0f) - ((skyParameters.orbit - 1) * settings.queryFloat("sun.dynamicScale.byDistance.step", 0.0f));
 
     orbiters.append({SkyOrbiterType::Sun,
         scale / highResScale,

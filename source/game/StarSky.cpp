@@ -484,9 +484,9 @@ Color Sky::skyFlashColor() const {
 float Sky::brightnessMultiplier() const {
   float multiplier = 1.0f;
   if (m_settings.queryBool("sun.dynamicBrightness.bySize", false))
-    multiplier *= m_skyParameters.sunSize / m_settings.queryFloat("sun.dynamicSize.bySize.baseSize", 0.055f);
+    multiplier *= m_skyParameters.sunSize / m_settings.queryFloat("sun.dynamicScale.bySize.baseSize", 0.055f);
   if (m_settings.queryBool("sun.dynamicBrightness.byDistance", false) && m_skyParameters.orbit > 0)
-    multiplier *= m_settings.queryFloat("sun.dynamicSize.byDistance.maxScale", 1.0f) - ((m_skyParameters.orbit - 1) * m_settings.queryFloat("sun.dynamicSize.byDistance.step", 0.0f));
+    multiplier *= m_settings.queryFloat("sun.dynamicScale.byDistance.maxScale", 1.0f) - ((m_skyParameters.orbit - 1) * m_settings.queryFloat("sun.dynamicScale.byDistance.step", 0.0f));
   return multiplier;
 }
 

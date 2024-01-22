@@ -6,8 +6,15 @@
   },
   {
     "op": "add",
+    "path": "/sun/scale",
+    "value": 0.8 // base scale, dynamic scaling aplies after it
+  },
+  {
+    "op": "add",
     "path": "/sun/highRes",
     "value": {
+      
+      // to fix sun blockiness on high scales (2x+) (mainly noticeable on airless planets, such as moons)
       "active" : false,
       "resIncrease" : 4, // relative to the original
       "image" : "/sky/orbitals/highres/4x/sun.png"
@@ -43,24 +50,24 @@
   },
   {
     "op": "add",
-    "path": "/sun/dynamicSize",
+    "path": "/sun/dynamicScale",
     "value": {
 	
       // calculates scale as imageScale / baseSize
       "bySize" : {
-        "active" : false,
+        "active" : true,
         "baseSize" : 0.055 // medium imageScale from celestial.config
       },
 	  
       // calculates scale based on the orbit of a planet
+      // (note that in vanilla planets start spawning from 2nd orbit)
       "byDistance" : {
-        "active" : false,
+        "active" : true,
         "maxScale" : 1.45, // scale on the 1st orbit
         "step" : 0.12 // scale decrease with each next orbit
       }
     }
   },
-  
   {
     "op": "add",
     "path": "/sun/dynamicBrightness",
@@ -68,8 +75,8 @@
       // calculated as a multplier based on size and distance scaling:
       // (imageScale / baseSize) * (maxScale - ((orbit - 1) * step)) * intensity
       // recommended to be close to 1.0 at 5-6th orbit (assuming that imageScale / baseSize = 1)
-      "bySize" : false,
-      "byDistance" : false,
+      "bySize" : true,
+      "byDistance" : true,
 	  
       // adjust brightness if distance scaling results in more values lower than 1.0
       // applied only if any of the dynamic brightness modifiers are active
