@@ -400,8 +400,6 @@ Color Sky::environmentLight() const {
     Array<Vec4F, 4> colors;
     float multiplier = brightnessMultiplier();
     if (multiplier != 1.0f) {
-      multiplier *= m_settings.queryFloat("sun.dynamicBrightness.intensity", 1.0f);
-
       colors[0] = skyColoring.morningLightColor.multiplyRgb(multiplier).toRgbaF();
       colors[1] = skyColoring.dayLightColor.multiplyRgb(multiplier).toRgbaF();
       colors[2] = skyColoring.eveningLightColor.multiplyRgb(multiplier).toRgbaF();
@@ -437,8 +435,6 @@ pair<Color, Color> Sky::skyRectColors() const {
     float multiplier = brightnessMultiplier();
 
     if (multiplier != 1.0f) {
-      multiplier *= m_settings.queryFloat("sun.dynamicBrightness.intensity", 1.0f);
-
       topColorList[0] = skyColoring.morningColors.first.multiplyRgb(multiplier).toRgbaF();
       topColorList[1] = skyColoring.dayColors.first.multiplyRgb(multiplier).toRgbaF();
       topColorList[2] = skyColoring.eveningColors.first.multiplyRgb(multiplier).toRgbaF();
@@ -485,8 +481,10 @@ float Sky::brightnessMultiplier() const {
   float multiplier = 1.0f;
   if (m_settings.queryBool("sun.dynamicBrightness.bySize", false))
     multiplier *= m_skyParameters.sunSize / m_settings.queryFloat("sun.dynamicScale.bySize.baseSize", 0.055f);
-  if (m_settings.queryBool("sun.dynamicBrightness.byDistance", false) && m_skyParameters.orbit > 0)
+  if (m_settings.queryBool("sun.dynamicBrightness.byDistance.active", false) && m_skyParameters.orbit > 0) {
     multiplier *= m_settings.queryFloat("sun.dynamicScale.byDistance.maxScale", 1.0f) - ((m_skyParameters.orbit - 1) * m_settings.queryFloat("sun.dynamicScale.byDistance.step", 0.0f));
+    multiplier *= m_settings.queryFloat("sun.dynamicBrightness.byDistance.intensity", 1.0f);
+  }
   return multiplier;
 }
 
