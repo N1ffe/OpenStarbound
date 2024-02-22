@@ -7,7 +7,7 @@
   {
     "op": "add",
     "path": "/sun/scale",
-    "value": 0.8 // base scale, dynamic scaling aplies after it
+    "value": 0.7 // base scale, dynamic scaling aplies after it (sun image appears to have a higher scale in osb client?)
   },
   {
     "op": "add",
@@ -15,7 +15,7 @@
     "value": {
       
       // to fix sun blockiness on high scales (2x+) (mainly noticeable on airless planets, such as moons)
-      "active" : false,
+      "active" : true,
       "resIncrease" : 4, // relative to the original
       "image" : "/sky/orbitals/highres/4x/sun.png"
     }
@@ -53,9 +53,9 @@
     "path": "/sun/dynamicScale",
     "value": {
 	
-      // calculates scale as imageScale / baseSize
+      // calculates scale as celestial imageScale / baseSize
       "bySize" : {
-        "active" : true,
+        "active" : false,
         "baseSize" : 0.055 // medium imageScale from celestial.config
       },
 	  
@@ -63,8 +63,8 @@
       // (note that in vanilla planets start spawning from 2nd orbit)
       "byDistance" : {
         "active" : true,
-        "maxScale" : 1.45, // scale on the 1st orbit
-        "step" : 0.12 // scale decrease with each next orbit
+        "maxScale" : 2.2, // scale on the 1st orbit
+        "step" : 0.2 // scale decrease with each next orbit
       }
     }
   },
@@ -76,10 +76,10 @@
       // calculated as a multplier based on size and distance scaling:
       // (imageScale / baseSize) * (maxScale - ((orbit - 1) * step)) * intensity
       // recommended to be close to 1.0 at 6th orbit (assuming that imageScale / baseSize = 1)
-      "bySize" : true,
+      "bySize" : false,
       "byDistance" : {
         "active" : true,
-        "intensity" : 1.2 // adjust brightness if distance scaling values are very low/high
+        "intensity" : 1 // adjust brightness if distance scaling values are very low/high
       }
     }
   }
