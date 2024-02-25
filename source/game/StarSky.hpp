@@ -93,7 +93,7 @@ public:
   pair<Color, Color> skyRectColors() const;
   Color skyFlashColor() const;
 
-  float brightnessMultiplier() const;
+  Array<float, 4> brightnessMultiplier() const;
 
   bool flying() const;
   FlyingType flyingType() const;

@@ -398,12 +398,12 @@ Color Sky::environmentLight() const {
     auto skyColoring = m_skyParameters.skyColoring.left();
 
     Array<Vec4F, 4> colors;
-    float multiplier = brightnessMultiplier();
-    if (multiplier != 1.0f) {
-      colors[0] = skyColoring.morningLightColor.multiplyRgb(multiplier).toRgbaF();
-      colors[1] = skyColoring.dayLightColor.multiplyRgb(multiplier).toRgbaF();
-      colors[2] = skyColoring.eveningLightColor.multiplyRgb(multiplier).toRgbaF();
-      colors[3] = skyColoring.nightLightColor.multiplyRgb(multiplier).toRgbaF();
+    Array<float, 4> multiplier = brightnessMultiplier();
+    if (multiplier != Array<float, 4>(1.0f, 1.0f, 1.0f, 1.0f)) {
+      colors[0] = skyColoring.morningLightColor.multiplyRgb(multiplier[0]).toRgbaF();
+      colors[1] = skyColoring.dayLightColor.multiplyRgb(multiplier[1]).toRgbaF();
+      colors[2] = skyColoring.eveningLightColor.multiplyRgb(multiplier[2]).toRgbaF();
+      colors[3] = skyColoring.nightLightColor.multiplyRgb(multiplier[3]).toRgbaF();
     }
     else {
       colors[0] = skyColoring.morningLightColor.toRgbaF();
@@ -432,18 +432,18 @@ pair<Color, Color> Sky::skyRectColors() const {
     Array<Vec4F, 4> topColorList;
     Array<Vec4F, 4> bottomColorList;
 
-    float multiplier = brightnessMultiplier();
+    Array<float, 4> multiplier = brightnessMultiplier();
 
-    if (multiplier != 1.0f) {
-      topColorList[0] = skyColoring.morningColors.first.multiplyRgb(multiplier).toRgbaF();
-      topColorList[1] = skyColoring.dayColors.first.multiplyRgb(multiplier).toRgbaF();
-      topColorList[2] = skyColoring.eveningColors.first.multiplyRgb(multiplier).toRgbaF();
-      topColorList[3] = skyColoring.nightColors.first.multiplyRgb(multiplier).toRgbaF();
+    if (multiplier != Array<float, 4>(1.0f, 1.0f, 1.0f, 1.0f)) {
+      topColorList[0] = skyColoring.morningColors.first.multiplyRgb(multiplier[0]).toRgbaF();
+      topColorList[1] = skyColoring.dayColors.first.multiplyRgb(multiplier[1]).toRgbaF();
+      topColorList[2] = skyColoring.eveningColors.first.multiplyRgb(multiplier[2]).toRgbaF();
+      topColorList[3] = skyColoring.nightColors.first.multiplyRgb(multiplier[3]).toRgbaF();
 
-      bottomColorList[0] = skyColoring.morningColors.second.multiplyRgb(multiplier).toRgbaF();
-      bottomColorList[1] = skyColoring.dayColors.second.multiplyRgb(multiplier).toRgbaF();
-      bottomColorList[2] = skyColoring.eveningColors.second.multiplyRgb(multiplier).toRgbaF();
-      bottomColorList[3] = skyColoring.nightColors.second.multiplyRgb(multiplier).toRgbaF();
+      bottomColorList[0] = skyColoring.morningColors.second.multiplyRgb(multiplier[0]).toRgbaF();
+      bottomColorList[1] = skyColoring.dayColors.second.multiplyRgb(multiplier[1]).toRgbaF();
+      bottomColorList[2] = skyColoring.eveningColors.second.multiplyRgb(multiplier[2]).toRgbaF();
+      bottomColorList[3] = skyColoring.nightColors.second.multiplyRgb(multiplier[3]).toRgbaF();
     }
     else {
       topColorList[0] = skyColoring.morningColors.first.toRgbaF();
@@ -477,14 +477,35 @@ Color Sky::skyFlashColor() const {
   return res;
 }
 
-float Sky::brightnessMultiplier() const {
-  float multiplier = 1.0f;
-  if (m_settings.queryBool("sun.dynamicBrightness.bySize", false))
-    multiplier *= m_skyParameters.sunSize / m_settings.queryFloat("sun.dynamicScale.bySize.baseSize", 0.055f);
-  if (m_settings.queryBool("sun.dynamicBrightness.byDistance.active", false) && m_skyParameters.orbit > 0) {
-    multiplier *= m_settings.queryFloat("sun.dynamicScale.byDistance.maxScale", 1.0f) - ((m_skyParameters.orbit - 1) * m_settings.queryFloat("sun.dynamicScale.byDistance.step", 0.0f));
-    multiplier *= m_settings.queryFloat("sun.dynamicBrightness.byDistance.intensity", 1.0f);
+Array<float, 4> Sky::brightnessMultiplier() const {
+  Array<float, 4> multiplier = Array<float, 4>(1.0f, 1.0f, 1.0f, 1.0f);
+
+  float bySize = m_settings.queryBool("sun.dynamicMultipliers.bySize.active", false);
+  float bySizeBrightness = m_settings.queryBool("sun.dynamicMultipliers.bySize.affectsBrightness", false);
+  float byDistance = m_settings.queryBool("sun.dynamicMultipliers.byDistance.active", false);
+  float byDistanceBrightness = m_settings.queryBool("sun.dynamicMultipliers.byDistance.affectsBrightness", false);
+
+  if ((bySize && bySizeBrightness) || (byDistance && byDistanceBrightness && m_skyParameters.orbit > 0)) {
+    Array<float, 4> powerValues;
+    powerValues[0] = m_settings.queryFloat("sun.dynamicMultipliers.brightnessPower.morning", 1.0f);
+    powerValues[1] = m_settings.queryFloat("sun.dynamicMultipliers.brightnessPower.day", 1.0f);
+    powerValues[2] = m_settings.queryFloat("sun.dynamicMultipliers.brightnessPower.evening", 1.0f);
+    powerValues[3] = m_settings.queryFloat("sun.dynamicMultipliers.brightnessPower.night", 1.0f);
+
+    if (bySize && bySizeBrightness) {
+      float baseMultiplier = m_skyParameters.sunSize / m_settings.queryFloat("sun.dynamicMultipliers.bySize.baseSize", 0.055f);
+      for (int i = 0; i < 4; i++)
+        multiplier[i] *= pow(baseMultiplier, powerValues[i]);
+    }
+
+    if (byDistance && byDistanceBrightness && m_skyParameters.orbit > 0) {
+      float baseMultiplier = m_settings.queryFloat("sun.dynamicMultipliers.byDistance.maxScale", 1.0f) - ((m_skyParameters.orbit - 1) * m_settings.queryFloat("sun.dynamicMultipliers.byDistance.step", 0.0f));
+      baseMultiplier *= m_settings.queryFloat("sun.dynamicMultipliers.byDistance.intensity", 1.0f);
+      for (int i = 0; i < 4; i++)
+        multiplier[i] *= pow(baseMultiplier, powerValues[i]);
+    }
   }
+
   return multiplier;
 }
 

@@ -50,36 +50,39 @@
   },
   {
     "op": "add",
-    "path": "/sun/dynamicScale",
+    "path": "/sun/dynamicMultipliers",
     "value": {
 	
-      // calculates scale as celestial imageScale / baseSize
+      // multiplies sun scale by formula:
+      //   celestial imageScale / baseSize
+      // multiplies sky and lighting brightness (if active and affectsBrightness set to true) by formula:
+      //   (celestial imageScale / baseSize) ^ brightnessPower
       "bySize" : {
         "active" : false,
-        "baseSize" : 0.055 // medium imageScale from celestial.config
+        "baseSize" : 0.055, // medium imageScale from celestial.config
+        "affectsBrightness" : true
       },
 	  
-      // calculates scale based on the orbit of a planet
-      // (note that in vanilla planets start spawning from 2nd orbit)
+      // multiplies scale by formula:
+      //   maxScale - ((orbit - 1) * step)
+      // multiplies sky and lighting brightness (if active and affectsBrightness set to true) by formula:
+      //   ((maxScale - ((orbit - 1) * step)) * intensity) ^ brightnessPower
+      // note that in vanilla planets start spawning from 2nd orbit
+      // recommended to have this (byDistance) brightness multiplier to be close to 1.0 at 6-7th orbit
       "byDistance" : {
         "active" : true,
         "maxScale" : 2.2, // scale on the 1st orbit
-        "step" : 0.2 // scale decrease with each next orbit
-      }
-    }
-  },
-  {
-    "op": "add",
-    "path": "/sun/dynamicBrightness",
-    "value": {
-	
-      // calculated as a multplier based on size and distance scaling:
-      // (imageScale / baseSize) * (maxScale - ((orbit - 1) * step)) * intensity
-      // recommended to be close to 1.0 at 6th orbit (assuming that imageScale / baseSize = 1)
-      "bySize" : false,
-      "byDistance" : {
-        "active" : true,
-        "intensity" : 1 // adjust brightness if distance scaling values are very low/high
+        "step" : 0.2, // scale decrease with each next orbit
+     	"affectsBrightness" : true,
+        "intensity" : 1
+      },
+	  
+      // determines how significant brightness change will be
+      "brightnessPower" : {
+        "morning" : 0.9,
+        "day" : 1,
+        "evening" : 0.9,
+        "night" : 0.4
       }
     }
   }

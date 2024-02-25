@@ -388,10 +388,10 @@ void EnvironmentPainter::drawRay(float pixelRatio,
     rayColor = jsonToVec3B(sky.settings.query("sun.rayColor", JsonArray{ RayColor[0], RayColor[1], RayColor[2] }));
 
   float sunScale = sky.settings.queryFloat("sun.scale", 1.0f);
-  if (sky.settings.queryBool("sun.dynamicScale.bySize.active", false))
-    sunScale *= sky.skyParameters.sunSize / sky.settings.queryFloat("sun.dynamicScale.bySize.baseSize", 0.055f);
-  if (sky.settings.queryBool("sun.dynamicScale.byDistance.active", false) && sky.skyParameters.orbit > 0)
-    sunScale *= sky.settings.queryFloat("sun.dynamicScale.byDistance.maxScale", 1.0f) - ((sky.skyParameters.orbit - 1) * sky.settings.queryFloat("sun.dynamicScale.byDistance.step", 0.0f));
+  if (sky.settings.queryBool("sun.dynamicMultipliers.bySize.active", false))
+    sunScale *= sky.skyParameters.sunSize / sky.settings.queryFloat("sun.dynamicMultipliers.bySize.baseSize", 0.055f);
+  if (sky.settings.queryBool("sun.dynamicMultipliers.byDistance.active", false) && sky.skyParameters.orbit > 0)
+    sunScale *= sky.settings.queryFloat("sun.dynamicMultipliers.byDistance.maxScale", 1.0f) - ((sky.skyParameters.orbit - 1) * sky.settings.queryFloat("sun.dynamicMultipliers.byDistance.step", 0.0f));
 
   m_renderer->immediatePrimitives().emplace_back(std::in_place_type_t<RenderQuad>(), TexturePtr(),
       RenderVertex{start + Vec2F(std::cos(angle + width), std::sin(angle + width)) * length, {}, Vec4B(rayColor, 0), 0.0f},
