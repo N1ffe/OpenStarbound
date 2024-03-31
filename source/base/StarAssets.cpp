@@ -141,6 +141,10 @@ Assets::Assets(Settings settings, StringList assetSources) {
       return b ? scan(a.value(), *b) : scan(a.value());
     });
 
+    callbacks.registerCallback("source", [this](String const& path) -> Json {
+      return assetSourceMetadata(assetSource(path));
+    });
+
     if (newFiles) {
       callbacks.registerCallback("add", [&newFiles](LuaEngine& engine, String const& path, LuaValue const& data) {
         ByteArray bytes;
